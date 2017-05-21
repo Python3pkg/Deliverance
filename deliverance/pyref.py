@@ -29,7 +29,7 @@ class DefaultDict(DictMixin):
         if key in self.wrapping:
             del self.wrapping[key]
     def keys(self):
-        return self.wrapping.keys()
+        return list(self.wrapping.keys())
     def __contains__(self, key):
         return True
 
@@ -59,7 +59,7 @@ class PyReference(object):
         """
         s = el.get(attr_name)
         args = {}
-        for name, value in el.attrib.items():
+        for name, value in list(el.attrib.items()):
             if name.startswith('pyarg-'):
                 args[name[len('pyarg-'):]] = value
         if not s:
@@ -112,7 +112,7 @@ class PyReference(object):
         if self.module_name:
             if self.module_name not in self._modules:
                 new_mod = simple_import(self.module_name)
-                for name, value in self.default_objs.items():
+                for name, value in list(self.default_objs.items()):
                     if not hasattr(new_mod, name):
                         setattr(new_mod, name, value)
                 self._modules[self.module_name] = new_mod
@@ -125,10 +125,10 @@ class PyReference(object):
                 name = name.replace('\\', '_').replace('/', '_')
                 new_mod = new.module(name)
                 new_mod.__file__ = filename
-                for name, value in self.default_objs.items():
+                for name, value in list(self.default_objs.items()):
                     if not hasattr(new_mod, name):
                         setattr(new_mod, name, value)
-                execfile(filename, new_mod.__dict__)
+                exec(compile(open(filename).read(), filename, 'exec'), new_mod.__dict__)
                 self._modules[filename] = new_mod
             return self._modules[filename]
 
@@ -142,14 +142,14 @@ class PyReference(object):
             ## FIXME: better error handling:
             try:
                 obj = getattr(obj, part)
-            except AttributeError, e:
+            except AttributeError as e:
                 raise Exception(
                     "Could not get function %s: %s; existing attributes: %s"
                     % (part, e, ', '.join(dir(obj))))
         return obj
     
     def __call__(self, *args, **kw):
-        for name, value in self.args.iteritems():
+        for name, value in self.args.items():
             kw.setdefault(name, value)
         return self.function(*args, **kw)
     
@@ -167,7 +167,7 @@ class PyReference(object):
         tmpl = Template(filename)
         try:
             return tmpl.substitute(vars)
-        except ValueError, e:
+        except ValueError as e:
             raise DeliveranceSyntaxError(
                 "The filename %r contains bad $ substitutions: %s"
                 % (filename, e),
@@ -191,5 +191,5 @@ class PyReference(object):
         return ' '.join(parts)
     
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')
 

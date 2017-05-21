@@ -42,14 +42,14 @@ def add_exception_info(info, exc_info=None):
     if exc_info is None:
         exc_info = sys.exc_info()
     exc_class, exc, tb = exc_info
-    if isinstance(exc_class, basestring):
+    if isinstance(exc_class, str):
         # Not much we can do here, but...
         exc_class += ' '+info
         return exc_class, exc, tb
     prev_message = str(exc)
     args = getattr(exc, 'args', None)
     if args is not None:
-        if len(args) != 1 or not isinstance(args[0], basestring):
+        if len(args) != 1 or not isinstance(args[0], str):
             args = tuple(args) + (info,)
             exc.args = args
         else:

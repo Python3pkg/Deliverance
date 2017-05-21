@@ -25,5 +25,5 @@ if __name__ == '__main__':
     host = '127.0.0.1'
     if ':' in port:
         host, port = port.split(':')
-    print 'See http://%s:%s/?deliv_log for the page with log messages' % (host, port)
+    print('See http://%s:%s/?deliv_log for the page with log messages' % (host, port))
     serve(EvalException(full_app), port=port, host=host)

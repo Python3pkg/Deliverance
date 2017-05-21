@@ -1,5 +1,5 @@
 """Converts filenames to ``file:`` URLs and back again"""
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import os
 import re
 
@@ -27,7 +27,7 @@ def url_to_filename(url):
     assert url.startswith('file:'), (
         "You can only turn file: urls into filenames (not %r)" % url)
     filename = url[len('file:'):].lstrip('/')
-    filename = urllib.unquote(filename)
+    filename = urllib.parse.unquote(filename)
     if url_drive_re.match(filename):
         filename = filename[0] + ':' + filename[2:]
     else:

@@ -3,7 +3,7 @@ Represents <theme> elements
 """
 
 import posixpath
-import urlparse
+import urllib.parse
 from deliverance.exceptions import DeliveranceSyntaxError, AbortTheme
 from deliverance.pyref import PyReference
 from deliverance.security import execute_pyref
@@ -62,5 +62,5 @@ class Theme(object):
                 href = new_href
         ## FIXME: is this join a good idea?
         if href:
-            href = urlparse.urljoin(req.url, href)
+            href = urllib.parse.urljoin(req.url, href)
         return href

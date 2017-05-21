@@ -18,6 +18,6 @@ class NestedDict(DictMixin):
     def keys(self):
         keys = set()
         for d in self.dicts:
-            keys.update(d.keys())
+            keys.update(list(d.keys()))
         return list(keys)
 

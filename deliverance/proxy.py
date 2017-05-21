@@ -2,9 +2,9 @@
 Implements everything related to proxying
 """
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import posixpath
-import urlparse
+import urllib.parse
 import re
 import socket
 import os
@@ -95,7 +95,7 @@ class ProxySet(object):
             if proxy.match(request, None, None, log):
                 try:
                     return proxy.forward_request(environ, start_response)
-                except AbortProxy, e:
+                except AbortProxy as e:
                     log.debug(
                         self, '<proxy> aborted (%s), trying next proxy' % e)
                     continue
@@ -313,7 +313,7 @@ class Proxy(object):
         log = request.environ['deliverance.log']
         for modifier in self.request_modifications:
             request = modifier.modify_request(request, log)
-        if self.dest and self.dest.next:
+        if self.dest and self.dest.__next__:
             raise AbortProxy
 
         dest, wsgiapp = None, None
@@ -351,8 +351,8 @@ class Proxy(object):
         """
 
         dest = url_normalize(dest)
-        scheme, netloc, path, query, fragment = urlparse.urlsplit(dest)
-        path = urllib.unquote(path)
+        scheme, netloc, path, query, fragment = urllib.parse.urlsplit(dest)
+        path = urllib.parse.unquote(path)
         
         assert not fragment, (
             "Unexpected fragment: %r" % fragment)
@@ -425,11 +425,11 @@ class Proxy(object):
         try:
             resp = proxy_req.get_response(proxy_exact_request)
             if resp.status_int == 500:
-                print 'Request:'
-                print proxy_req
-                print 'Response:'
-                print resp
-        except socket.error, e:
+                print('Request:')
+                print(proxy_req)
+                print('Response:')
+                print(resp)
+        except socket.error as e:
             ## FIXME: really wsgiproxy should handle this
             ## FIXME: which error?
             ## 502 HTTPBadGateway, 503 HTTPServiceUnavailable, 504 HTTPGatewayTimeout?
@@ -458,7 +458,7 @@ class Proxy(object):
             dest = dest.split('?', 1)[0]
         filename = url_to_filename(dest)
         rest = posixpath.normpath(request.path_info)
-        proxied_url = dest.lstrip('/') + '/' + urllib.quote(rest.lstrip('/'))
+        proxied_url = dest.lstrip('/') + '/' + urllib.parse.quote(rest.lstrip('/'))
         ## FIXME: handle /->/index.html
         filename = filename.rstrip('/') + '/' + rest.lstrip('/')
         if os.path.isdir(filename):
@@ -498,7 +498,7 @@ class Proxy(object):
             filename = url_to_filename(dest_href)
             editor = Editor(base_dir=filename)
             return editor(environ, start_response)
-        except exc.HTTPException, e:
+        except exc.HTTPException as e:
             return e(environ, start_response)
 
     @property
@@ -595,7 +595,7 @@ class ProxyDest(object):
 
     def __call__(self, request, log):
         """Determine the destination given the request"""
-        assert not self.next
+        assert not self.__next__
         if self.pyref:
             if not execute_pyref(request):
                 log.error(
@@ -623,7 +623,7 @@ class ProxyDest(object):
                      html_quote(html_quote(self.href))))
         if self.pyref:
             parts.append('pref="%s"' % html_quote(self.pyref))
-        if self.next:
+        if self.__next__:
             parts.append('next="1"')
         parts.append('/&gt;')
         return ' '.join(parts)
@@ -773,14 +773,14 @@ class ProxyResponseModification(object):
                 ## http://www.openplans.org, it won't be rewritten and
                 ## that can be confusing -- it *shouldn't* be
                 ## rewritten, but some better log message is required
-                loc = urlparse.urljoin(proxied_url, response.location)
+                loc = urllib.parse.urljoin(proxied_url, response.location)
                 loc = link_repl_func(loc)
                 response.location = loc
             if 'set-cookie' in response.headers:
                 cookies = response.headers.getall('set-cookie')
                 del response.headers['set-cookie']
                 for cook in cookies:
-                    old_domain = urlparse.urlsplit(proxied_url)[1].lower()
+                    old_domain = urllib.parse.urlsplit(proxied_url)[1].lower()
                     new_domain = request.host.split(':', 1)[0].lower()
                     def rewrite_domain(match):
                         """Rewrites domains to point to this proxy"""
@@ -899,7 +899,7 @@ class ProxySettings(object):
                 element=el)
         if not dev_users and not dev_htpasswd:
             ## FIXME: not sure this is the best way to warn
-            print 'Warning: no <dev-users> or <dev-htpasswd>; logging is inaccessible'
+            print('Warning: no <dev-users> or <dev-htpasswd>; logging is inaccessible')
         ## FIXME: add a default allow_ips of 127.0.0.1?
         return cls(server_host, execute_pyref=execute_pyref, 
                    display_local_files=display_local_files,

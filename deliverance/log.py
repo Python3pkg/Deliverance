@@ -175,7 +175,7 @@ class SavingLogger(object):
         elif isinstance(el, _Element):
             return html_quote(tostring(el))
         else:
-            return html_quote(unicode(el))
+            return html_quote(str(el))
 
     def color_for_level(self, level):
         """
@@ -213,5 +213,5 @@ class PrintingLogger(SavingLogger):
                 s = tostring(el)
             else:
                 s = str(el)
-            print '%s (%s)' % (msg, s)
+            print('%s (%s)' % (msg, s))
         return msg

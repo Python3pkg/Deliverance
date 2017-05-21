@@ -97,7 +97,7 @@ def make_getter(meth_name):
             environ = environ.environ
         ## FIXME: handle case when security context isn't in place?
         return getattr(environ['deliverance.security_context'], meth_name)(environ)
-    getter.func_name = meth_name
+    getter.__name__ = meth_name
     getter.__doc__ = getter.__doc__ % dict(name=meth_name)
     return getter
 

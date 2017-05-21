@@ -78,7 +78,7 @@ class AbstractMatch(object):
     def __unicode__(self):
         assert self.element_name, (
             "You must set element_name in subclasses")
-        parts = [u'<%s' % self.element_name]
+        parts = ['<%s' % self.element_name]
         parts.extend(self._uni_early_args())
         for attr, value in [
             ('path', self.path),
@@ -88,11 +88,11 @@ class AbstractMatch(object):
             ('response-status', self.response_status),
             ('environ', self.environ)]:
             if value:
-                parts.append(u'%s="%s"' % (attr, html_quote(unicode(value))))
+                parts.append('%s="%s"' % (attr, html_quote(str(value))))
         if self.pyref:
-            parts.append(unicode(self.pyref))
+            parts.append(str(self.pyref))
         parts.extend(self._uni_late_args())
-        parts.append(u'/>')
+        parts.append('/>')
         return ' '.join(parts)
 
     def _uni_early_args(self):
@@ -104,7 +104,7 @@ class AbstractMatch(object):
         return []
 
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')
 
     def debug_description(self):
         """Override to control the way this object displays in debugging contexts"""
@@ -188,7 +188,7 @@ class AbstractMatch(object):
                         'Skipping %s because the reference <%s> returned false',
                         debug_name, self.pyref)
                     return False
-                if isinstance(result, basestring):
+                if isinstance(result, str):
                     result = result.split()
                 if isinstance(result, (list, tuple)):
                     return getattr(self, 'classes', []) + list(result)
@@ -232,7 +232,7 @@ class Match(AbstractMatch):
     def _uni_early_args(self):
         """Add the extra args <match> uses"""
         if self.classes:
-            return [u'class="%s"' % html_quote(' '.join(self.classes))]
+            return ['class="%s"' % html_quote(' '.join(self.classes))]
         else:
             return []
 
@@ -240,9 +240,9 @@ class Match(AbstractMatch):
         """Add the extra args <match> uses"""
         parts = []
         if self.abort:
-            parts.append(u'abort="1"')
+            parts.append('abort="1"')
         if self.last:
-            parts.append(u'last="1"')
+            parts.append('last="1"')
         return parts
 
     def debug_description(self):

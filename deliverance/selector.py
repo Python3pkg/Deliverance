@@ -44,7 +44,7 @@ class Selector(object):
 
         Returns (type, attributes, rest_expr)
         """
-        assert isinstance(expr, basestring), "Bad value for expr: %r" % expr
+        assert isinstance(expr, str), "Bad value for expr: %r" % expr
         match = type_re.match(expr)
         if match:
             major_type = match.group(1)
@@ -75,7 +75,7 @@ class Selector(object):
             return type1 == type2
             
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')
 
     def compile_selector(self, expr, default_type):
         """
@@ -98,7 +98,7 @@ class Selector(object):
         else:
             try:
                 selector = CSSSelector(rest_expr)
-            except AssertionError, e:
+            except AssertionError as e:
                 raise DeliveranceSyntaxError('Bad CSS selector: "%s" (%s)' % (expr, e))
         return (type, selector, expr, attributes)
 

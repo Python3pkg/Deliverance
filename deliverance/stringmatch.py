@@ -89,7 +89,7 @@ class Matcher(object):
         return '%s:%s' % (self.name, self.pattern)
 
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')
     
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, str(self))
@@ -137,7 +137,7 @@ class RegexMatcher(Matcher):
         super(RegexMatcher, self).__init__(pattern)
         try:
             self.compiled = re.compile(pattern)
-        except re.error, e:
+        except re.error as e:
             raise MatchSyntaxError(
                 "Invalid regular expression %r: %s"
                 % (pattern, e))
@@ -312,10 +312,10 @@ class HeaderMatcher(object):
         return self.pattern(headers.get(self.header, '')), [self.header]
 
     def __unicode__(self):
-        return u'%s: %s' % (self.header, self.pattern)
+        return '%s: %s' % (self.header, self.pattern)
 
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')
 
 class HeaderWildcardMatcher(object):
     """
@@ -338,7 +338,7 @@ class HeaderWildcardMatcher(object):
         return False, matched
 
     def __unicode__(self):
-        return u'%s: %s' % (self.header, self.pattern)
+        return '%s: %s' % (self.header, self.pattern)
 
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')

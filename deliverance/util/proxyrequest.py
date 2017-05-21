@@ -19,7 +19,7 @@ class Response(webob.Response):
         if not self.charset:
             raise AttributeError(
                 "You cannot access Response.unicode_body unless charset is set")
-        if not isinstance(value, unicode):
+        if not isinstance(value, str):
             raise TypeError(
                 "You can only set Response.unicode_body to a unicode string (not %s)" % type(value))
         self.body = value.encode(self.charset)

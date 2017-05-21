@@ -65,7 +65,7 @@ def run_command(rule_filename, debug=False, interactive_debugger=False,
         try:
             from repoze.profile.profiler import AccumulatingProfileMiddleware
         except ImportError:
-            print 'Error: you must manually install repoze.profiler to use --profile'
+            print('Error: you must manually install repoze.profiler to use --profile')
             sys.exit(1)
         app = AccumulatingProfileMiddleware(
             app,
@@ -77,7 +77,7 @@ def run_command(rule_filename, debug=False, interactive_debugger=False,
         try:
             from dozer import Dozer
         except ImportError:
-            print 'Error: you must manually install Dozer to use --memory-profile'
+            print('Error: you must manually install Dozer to use --memory-profile')
             sys.exit(1)
         app = Dozer(app)
     if interactive_debugger:
@@ -93,10 +93,10 @@ def run_command(rule_filename, debug=False, interactive_debugger=False,
         from deliverance.garbagecollect import GarbageCollectingMiddleware
         app = GarbageCollectingMiddleware(app)
 
-    print 'To see logging, visit %s/.deliverance/login' % settings.base_url
-    print '    after login go to %s/?deliv_log' % settings.base_url
+    print('To see logging, visit %s/.deliverance/login' % settings.base_url)
+    print('    after login go to %s/?deliv_log' % settings.base_url)
     if profile:
-        print 'To see profiling information visit %s/.deliverance/profile' % settings.base_url
+        print('To see profiling information visit %s/.deliverance/profile' % settings.base_url)
     serve(app, host=settings.host, port=settings.port)
 
 class ReloadingApp(object):
@@ -122,7 +122,7 @@ class ReloadingApp(object):
     def load_proxy_set(self, warn=True):
         """Loads or reloads the ProxySet object from the file"""
         if warn:
-            print 'Reloading rule file %s' % self.rule_filename
+            print('Reloading rule file %s' % self.rule_filename)
         self.proxy_set = ProxySet.parse_file(
             self.rule_filename,
             middleware_factory=self.settings.middleware_factory,

@@ -9,7 +9,7 @@ def asbool(obj):
     into true, and "false", "f", "no", "n", "off" and "0" into false.
     Non-string values are left alone.  Other strings are errors.
     """
-    if isinstance(obj, (str, unicode)):
+    if isinstance(obj, str):
         obj = obj.strip().lower()
         if obj in ['true', 'yes', 'on', 'y', 't', '1']:
             return True
@@ -23,5 +23,5 @@ def asbool(obj):
 from cgi import escape as cgi_escape
 def html_quote(s):
     """HTML quotes the string"""
-    s = unicode(s)
+    s = str(s)
     return cgi_escape(s, True)

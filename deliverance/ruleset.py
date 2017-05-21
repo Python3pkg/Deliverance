@@ -15,7 +15,7 @@ from deliverance.rules import Rule, remove_content_attribs
 from deliverance.themeref import Theme
 from deliverance.util.cdata import escape_cdata, unescape_cdata
 from deliverance.util.charset import fix_meta_charset_position, force_charset
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 class RuleSet(object):
     """

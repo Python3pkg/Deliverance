@@ -5,8 +5,8 @@ Implements the middleware that does the Deliverance transformations.
 import posixpath
 import mimetypes
 import os
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 import re
 import simplejson
 import datetime
@@ -267,7 +267,7 @@ document.cookie = 'jsEnabled=1; expires=__DATE__; path=/';
             query_string = ''
             if '?' in new_path_info:
                 new_path_info, query_string = new_path_info.split('?', 1)
-            new_path_info = urllib.unquote(new_path_info)
+            new_path_info = urllib.parse.unquote(new_path_info)
             assert new_path_info.startswith('/')
             subreq.path_info = new_path_info
             subreq.query_string = query_string
@@ -355,7 +355,7 @@ document.cookie = 'jsEnabled=1; expires=__DATE__; path=/';
             args['selector'] = selector
         if browse:
             args['browse'] = '1'
-        url = base + '?' + urllib.urlencode(args)
+        url = base + '?' + urllib.parse.urlencode(args)
         if selector:
             url += '#deliverance-selection'
         if line:
@@ -377,7 +377,7 @@ document.cookie = 'jsEnabled=1; expires=__DATE__; path=/';
             return exc.HTTPNotFound('There is no %r action' % segment)
         try:
             return method(req, resource_fetcher)
-        except exc.HTTPException, e:
+        except exc.HTTPException as e:
             return e
 
     def action_media(self, req, resource_fetcher):
@@ -560,7 +560,7 @@ document.cookie = 'jsEnabled=1; expires=__DATE__; path=/';
                 new_lines.extend(wrap_html_line(line))
             return '\n'.join(new_lines)
         def mark_deliv_match(highlighted_text):
-            result = re.sub(r'(?:<[^/][^>]*>)*&lt;.*?DELIVERANCE-MATCH=.*?&gt;(?:</[^>]*>)*', lambda match: r'<b style="background-color: #ff8">%s</b>' % match.group(0), unicode(highlighted_text), re.S)
+            result = re.sub(r'(?:<[^/][^>]*>)*&lt;.*?DELIVERANCE-MATCH=.*?&gt;(?:</[^>]*>)*', lambda match: r'<b style="background-color: #ff8">%s</b>' % match.group(0), str(highlighted_text), re.S)
             return html(result)
         text = template.substitute(
             base_url=url,
@@ -641,7 +641,7 @@ document.cookie = 'jsEnabled=1; expires=__DATE__; path=/';
             rest, qs = rest.split('?', 1)
         else:
             qs = ''
-        subreq.script_name = urlparse.urlsplit(base)[2]
+        subreq.script_name = urllib.parse.urlsplit(base)[2]
         subreq.path_info = rest
         subreq.query_string = qs
         resp = subreq.get_response(self.app)
@@ -672,7 +672,7 @@ CLIENTSIDE_JAVASCRIPT = fp.read()
 del fp
 
 from lxml.etree import XML
-import urlparse
+import urllib.parse
 
 class SubrequestRuleGetter(object):
     """
@@ -687,7 +687,7 @@ class SubrequestRuleGetter(object):
         self.url = url
         
     def __call__(self, get_resource, app, orig_req):
-        url = urlparse.urljoin(orig_req.url, self.url)
+        url = urllib.parse.urljoin(orig_req.url, self.url)
         doc_resp = get_resource(url)
         if doc_resp.status_int == 304 and self._response is not None:
             doc_resp = self._response
@@ -704,7 +704,7 @@ class SubrequestRuleGetter(object):
         doc_text = doc_resp.body
         try:
             doc = XML(doc_text, base_url=url)
-        except XMLSyntaxError, e:
+        except XMLSyntaxError as e:
             raise Exception('Invalid syntax in %s: %s' % (url, e))
         assert doc.tag == 'ruleset', (
             'Bad rule tag <%s> in document %s' % (doc.tag, url))
@@ -726,7 +726,7 @@ class FileRuleGetter(object):
             fp = open(filename)
             doc = parse(fp, base_url='file://'+os.path.abspath(filename)).getroot()
             fp.close()
-        except XMLSyntaxError, e:
+        except XMLSyntaxError as e:
             raise Exception('Invalid syntax in %s: %s' % (filename, e))
         assert doc.tag == 'ruleset', (
             'Bad rule tag <%s> in document %s' % (doc.tag, filename))

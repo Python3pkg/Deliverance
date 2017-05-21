@@ -2,7 +2,7 @@ from paste.script.templates import Template, var
 from tempita import paste_script_template_renderer
 import os
 import posixpath
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from lxml.html import parse, tostring
 import mimetypes
 
@@ -34,8 +34,8 @@ class DeliveranceTemplate(Template):
 
     def get_content(self, url):
         """Gets the content and all embedded content (images, CSS, etc)"""
-        print 'Fetching theme at %s' % url
-        page = parse(urllib2.urlopen(url)).getroot()
+        print('Fetching theme at %s' % url)
+        page = parse(urllib.request.urlopen(url)).getroot()
         page.make_links_absolute()
         files = []
         for element, attr, link, pos in page.iterlinks():
@@ -48,7 +48,7 @@ class DeliveranceTemplate(Template):
             if attr is None:
                 old_value = element.text
             else:
-                old_value = unicode(element.attrib[attr])
+                old_value = str(element.attrib[attr])
             new_value = old_value[:pos] + filename + old_value[pos+len(link):]
             if attr is None:
                 element.text = new_value
@@ -65,11 +65,11 @@ class DeliveranceTemplate(Template):
         return False
 
     def get_embedded(self, url):
-        print '  fetching %s' % url
+        print('  fetching %s' % url)
         try:
-            resp = urllib2.urlopen(url)
-        except urllib2.HTTPError, e:
-            print 'Could not fetch %s: %s' % (url, e)
+            resp = urllib.request.urlopen(url)
+        except urllib.error.HTTPError as e:
+            print('Could not fetch %s: %s' % (url, e))
             return None, None
         url = resp.geturl()
         content = resp.read()

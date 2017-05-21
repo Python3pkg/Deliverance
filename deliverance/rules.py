@@ -4,10 +4,10 @@ puts them together
 """
 
 import copy
-import urlparse
+import urllib.parse
 from lxml import etree
 from lxml.html import document_fromstring, tostring
-from urllib import quote as url_quote
+from urllib.parse import quote as url_quote
 from tempita import html
 from deliverance.exceptions import DeliveranceSyntaxError, AbortTheme
 from deliverance.util.converters import asbool, html_quote
@@ -259,10 +259,10 @@ class AbstractAction(object):
     move_supported = True
 
     def __unicode__(self):
-        return unicode(self.log_description(log=None))
+        return str(self.log_description(log=None))
 
     def __str__(self):
-        return unicode(self).encode('utf8')
+        return str(self).encode('utf8')
 
     @classmethod
     def compile_selector(cls, el, attr, source_location, invertable=False):
@@ -342,7 +342,7 @@ class AbstractAction(object):
             body = 'content="%s"' % html_quote(self.content)
             if getattr(self, 'content_href', None):
                 if request_url:
-                    content_url = urlparse.urljoin(request_url, self.content_href)
+                    content_url = urllib.parse.urljoin(request_url, self.content_href)
                 else:
                     content_url = self.content_href
             else:
@@ -351,7 +351,7 @@ class AbstractAction(object):
         if getattr(self, 'content_href', None):
             dest = self.content_href
             if request_url:
-                dest = urlparse.urljoin(request_url, dest)
+                dest = urllib.parse.urljoin(request_url, dest)
             body = 'href="%s"' % html_quote(self.content_href)
             parts.append(linked_item(dest, body, source=True))
         if self.move_supported and not getattr(self, 'move', False):
@@ -481,7 +481,7 @@ class TransformAction(AbstractAction):
         """
         if self.content_href:
             ## FIXME: Is this a weird way to resolve the href?
-            href = urlparse.urljoin(log.request.url, self.content_href)
+            href = urllib.parse.urljoin(log.request.url, self.content_href)
             content_resp = resource_fetcher(href)
             log.debug(
                 self, 'Fetching resource from href="%s": %s',
@@ -561,7 +561,7 @@ class TransformAction(AbstractAction):
 
     def clientside_actions(self, content_doc, log):
         if self.content_href:
-            href = urlparse.urljoin(log.request.url, self.content_href)
+            href = urllib.parse.urljoin(log.request.url, self.content_href)
             url = '%s/.deliverance/subreq?url=%s&action=%s&content=%s&theme=%s' % (
                 log.request.application_url,
                 url_quote(href),
@@ -996,7 +996,7 @@ class Append(TransformAction):
                 else:
                     avoided_attrs = []
                     copied_attrs = []
-                    for key, value in content_attrib.items():
+                    for key, value in list(content_attrib.items()):
                         if key in theme_attrib:
                             avoided_attrs.append(key)
                         else:
